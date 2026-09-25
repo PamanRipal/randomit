@@ -131,12 +131,9 @@
   .edit-fab:hover{ border-color: var(--pink); }
   .wheel-holder{
     position: relative;
-    flex: 1 1 0;
-    min-height: 0;
-    width: auto;
-    max-width: 100%;
-    max-height: 100%;
-    aspect-ratio: 1/1;
+    flex: 0 0 auto;
+    width: 260px;
+    height: 260px;
   }
   canvas{
     width:100%;
@@ -403,7 +400,7 @@
   <div class="stage">
     <div class="wheel-card">
       <button class="edit-fab" id="editBtn">✏️ Edit isi</button>
-      <div class="wheel-holder">
+      <div class="wheel-holder" id="wheelHolder">
         <svg class="pointer" viewBox="0 0 34 40" xmlns="http://www.w3.org/2000/svg">
           <path d="M17 40 L2 8 Q17 -6 32 8 Z" fill="#ff5d9e" stroke="#150f30" stroke-width="2"/>
         </svg>
@@ -500,6 +497,19 @@
   const resultOverlay = document.getElementById('resultOverlay');
   const resultValue = document.getElementById('resultValue');
   const closeResult = document.getElementById('closeResult');
+
+  const stageEl = document.querySelector('.stage');
+  const wheelCardEl = document.querySelector('.wheel-card');
+  const wheelHolderEl = document.getElementById('wheelHolder');
+
+  function sizeWheelHolder(){
+    const cardGap = parseFloat(getComputedStyle(wheelCardEl).gap) || 0;
+    const availH = stageEl.clientHeight - editBtn.offsetHeight * 0 - spinBtn.offsetHeight - cardGap - 8;
+    const availW = stageEl.clientWidth - 8;
+    const size = Math.max(140, Math.floor(Math.min(availH, availW)));
+    wheelHolderEl.style.width = size + 'px';
+    wheelHolderEl.style.height = size + 'px';
+  }
 
   function renderTemplates(){
     templatesEl.innerHTML = '';
@@ -722,8 +732,13 @@
 
   renderTemplates();
   renderItems();
+  sizeWheelHolder();
   drawWheel();
-  window.addEventListener('resize', drawWheel);
+  window.addEventListener('resize', () => { sizeWheelHolder(); drawWheel(); });
+  window.addEventListener('orientationchange', () => { setTimeout(() => { sizeWheelHolder(); drawWheel(); }, 60); });
+  if (document.fonts && document.fonts.ready){
+    document.fonts.ready.then(() => { sizeWheelHolder(); drawWheel(); });
+  }
 </script>
 </body>
 </html>
